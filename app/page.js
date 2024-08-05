@@ -7,7 +7,7 @@ import { collection, deleteDoc, doc, getDoc, getDocs, query, setDoc } from "fire
 
 export default function Home() {
   const [inventory, setInventory] = useState([]);
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [itemName, setItemName] = useState('');
 
 const updateInventory = async () => {
@@ -29,7 +29,7 @@ const addItem = async (item) => {
   const docSnapshot = await getDoc(docRef)
 
   if(docSnapshot.exists()) {
-    const {quantity} = docsSnapshot.data()
+    const {quantity} = docSnapshot.data()
     await setDoc(docRef, {quantity: quantity + 1})
   }
   else {
@@ -44,7 +44,7 @@ const addItem = async (item) => {
       const docSnapshot = await getDoc(docRef)
 
       if(docSnapshot.exists()) {
-        const {quantity} = docsSnapshot.data()
+        const {quantity} = docSnapshot.data()
         if (quantity == 1){
           await deleteDoc(docRef)
         }
@@ -57,6 +57,7 @@ const addItem = async (item) => {
   }
 
   useEffect(() => {
+    updateInventory()
   }, []);
 
   const handleOpen = () => setOpen(true)
@@ -67,8 +68,9 @@ const addItem = async (item) => {
     width = "100vw" 
     height = "100vh" 
     display = "flex" 
-    justify-content = "center" 
-    align-items = "center"
+    flexDirection="column"
+    justifyContent = "center" 
+    alignItems = "center"
     gap = {2}
     > 
       <Modal open={open} onClose={handleClose}>
@@ -92,12 +94,12 @@ const addItem = async (item) => {
           <Typography variant="h6">Add Item</Typography>
           <Stack width="100%" direction="row" spacing={2}>
             <TextField
-            variant="outlined"
-            fullWidth
-            value={itemName}
-            onChange= {(e) => {
-              setItemName(e.target.value)
-            }}
+              variant="outlined"
+              fullWidth
+              value={itemName}
+              onChange= {(e) => {
+                setItemName(e.target.value)
+              }}
             />
             
             <Button
@@ -110,13 +112,83 @@ const addItem = async (item) => {
             >
             Add
             </Button>
-
           </Stack>
-
         </Box>
       </Modal>
-      <Typography variant="h1">Inventory Mangement</Typography>
+      <Button 
+        variant="contained" 
+        onClick={() => {
+          handleOpen()
+        }}
+      >
+        Add New Item
+      </Button>
+      <Box border="1px solid #333">
+        <Box 
+          width="800px" 
+          height="100px" 
+          bgcolor="#ADD8E6" 
+          display="flex"
+          alignItems="center" 
+          justifyContent="center">
+          <Typography 
+            variant="h2" 
+            color= "#333">
+            Inventory Items
+          </Typography>
+        </Box>
+        <Stack width="800px" height="300px" spacing={2} overflow="auto">
+          {inventory.map(({name, quantity}) => (
+            <Box
+              key={name} 
+              width="100%" 
+              minHeight= "150px" 
+              display="flex" 
+              alignItems="center" 
+              justifyContent="space-between" 
+              bgcolor="#f0f0f0" 
+              padding={5}
+              >
+                <Typography 
+                variant="h3" 
+                color= "#333" 
+                textAlign="center"
+                >
+                  {name.charAt(0).toUpperCase() + name.slice(1)}
+                </Typography>
+                
+                <Typography 
+                variant="h3" 
+                color= "#333" 
+                textAlign="center"
+                >
+                  {quantity}
+                </Typography>
 
+                <Stack direction="row" spacing={2}>
+                  <Button
+                  variant="contained"
+                  onClick={() => {
+                    removeItem(name)
+                  }}
+                  >
+                    Remove
+                  </Button>
+                  
+                  <Button
+                  variant="contained"
+                  onClick={() => {
+                    addItem(name)
+                  }}
+                  >
+                    Add
+                  </Button>
+                </Stack>
+
+            </Box>
+          ))}
+        </Stack>
+        </Box>
     </Box>
   );
 }
