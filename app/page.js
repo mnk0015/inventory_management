@@ -2,7 +2,7 @@
 import Image from "next/image";
 import {useState, useEffect} from "react";
 import {firestore} from "@/firebase";
-import {Box, Modal, Stack, TextField, Typography} from "@mui/material";
+import {Box, Button, Modal, Stack, TextField, Typography} from "@mui/material";
 import { collection, deleteDoc, doc, getDoc, getDocs, query, setDoc } from "firebase/firestore";
 
 export default function Home() {
@@ -71,9 +71,9 @@ const addItem = async (item) => {
     align-items = "center"
     gap = {2}
     > 
-      <Modal open = {open} onClose = {handleClose}>
+      <Modal open={open} onClose={handleClose}>
         <Box
-        position="abosolute"
+        position="absolute"
         top="50%"
         left="50%"
         width={400}
@@ -91,9 +91,26 @@ const addItem = async (item) => {
 
           <Typography variant="h6">Add Item</Typography>
           <Stack width="100%" direction="row" spacing={2}>
-            <TextField>
+            <TextField
+            variant="outlined"
+            fullWidth
+            value={itemName}
+            onChange= {(e) => {
+              setItemName(e.target.value)
+            }}
+            />
+            
+            <Button
+            variant="outlined"
+            onClick={() => {
+              addItem(itemName)
+              setItemName('')
+              handleClose()
+            }}
+            >
+            Add
+            </Button>
 
-            </TextField>
           </Stack>
 
         </Box>
